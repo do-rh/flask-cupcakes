@@ -26,7 +26,7 @@ class Cupcake(db.Model):
         nullable=False)
     rating = db.Column(db.Integer, 
         nullable=False)
-    img = db.Column(db.Text, 
+    image = db.Column(db.Text, 
         nullable=False, 
         default='https://tinyurl.com/demo-cupcake')
 
