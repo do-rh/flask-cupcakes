@@ -1,6 +1,7 @@
 """Flask app for dessert demo."""
 
 from flask import Flask, request, jsonify
+from flask.templating import render_template
 from models import db, connect_db, Cupcake
 
 DEFAULT_IMG_URL = 'https://tinyurl.com/demo-cupcake'
@@ -11,6 +12,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
+
+@app.get('/')
+def get_homepage():
+
+    return render_template('index.html')
 
 @app.get('/api/cupcakes')
 def get_cupcakes():
@@ -32,6 +38,7 @@ def get_cupcake(cupcake_id):
 def make_cupcake():
     """Add a cupcake to the database and 
     return JSON of the new cupcake"""
+    
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
@@ -66,7 +73,7 @@ def update_cupcake(cupcake_id):
     cupcake.image = updated_data.get("image", cupcake.image)
     
     db.session.commit()
-    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
@@ -79,10 +86,11 @@ def update_cupcake(cupcake_id):
 
 @app.delete('/api/cupcakes/<int:cupcake_id>')
 def delete_cupcake(cupcake_id):
-    """Delete a cupcake from the database (using cupcake_id)"""
+    """Delete a cupcake from the database (using cupcake_id)
+        and returns id of deleted cupcake"""
     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
     db.session.delete(cupcake)
     db.session.commit()
 
-    return jsonify({"deleted": cupcake_id})
+    return jsonify({"deleted": cupcake_id}) #format could be the same as return in patch
